@@ -17,8 +17,8 @@ void setup() {
   pinMode(in4, OUTPUT);
 
   // Bật đầu ra PWM trên chân enA
-  analogWrite(enA, 1023);
-  analogWrite(enB, 1023);
+  analogWrite(enA, 256);
+  analogWrite(enB, 256);
 }
 
 void loop() {
