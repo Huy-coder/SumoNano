@@ -1,6 +1,3 @@
-#include "Motor.h"
-#include "LineSensor.h"
-#include "DetectSensor.h"
 #include <SharpIR.h>
 
 //Read digital value
@@ -8,9 +5,9 @@
 #define BACK_SENSOR 3
 
 //Read analog value
-#define BACKWARD_SENSOR A1
-#define LEFT_SENSOR A2
-#define RIGHT_SENSOR A3
+#define BACKWARD_SENSOR A3
+#define LEFT_SENSOR A1
+#define RIGHT_SENSOR A2
 
 //Model IR Sensor
 #define MODEL 1080
@@ -19,7 +16,6 @@
 #define EN_A 6
 #define IN_1 7
 #define IN_2 8
-
 #define EN_B 11
 #define IN_3 9
 #define IN_4 10
@@ -51,10 +47,19 @@ void setup()
 
 void loop() 
 {
+    Serial.print("Cam bien sau lung: ");
+    Serial.println(Backward_IR.distance());
+    Serial.print("Cam bien ben trai: ");
+    Serial.println(Left_IR.distance());
+    Serial.print("Cam bien ben phai: ");
+    Serial.println(Right_IR.distance());
     if(digitalRead(FRONT_SENSOR) == 1)
         runBackward();
     else if(digitalRead(BACK_SENSOR) == 1)
         runForward();
+    else
+        stopMotor();
+    delay(1000);
 }
 
 void runForward()
