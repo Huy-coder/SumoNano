@@ -4,8 +4,8 @@
 #include <SharpIR.h>
 
 //Read digital value
-#define FRONT_SENSOR 3
-#define BACK_SENSOR 4
+#define FRONT_SENSOR 4
+#define BACK_SENSOR 3
 
 //Read analog value
 #define BACKWARD_SENSOR A1
@@ -24,15 +24,18 @@
 #define IN_3 9
 #define IN_4 10
 
+//Robot's Status
+#define STOP 0
+#define RUN 1
+#define CIRCLE 2
+#define ESCAPE 3
+
 SharpIR Backward_IR = SharpIR(BACKWARD_SENSOR, MODEL);
 SharpIR Left_IR = SharpIR(LEFT_SENSOR, MODEL);
 SharpIR Right_IR = SharpIR(RIGHT_SENSOR, MODEL);
 
-DetectSensor detectSensor;
-LineSensor lineSensor;
-
-
-void setup() {
+void setup() 
+{
 
     Serial.begin(9600);
     pinMode(EN_A, OUTPUT);
@@ -46,32 +49,65 @@ void setup() {
     pinMode(BACK_SENSOR, INPUT);
 }
 
-void loop() {
+void loop() 
+{
+    if(digitalRead(FRONT_SENSOR) == 1)
+        runBackward();
+    else if(digitalRead(BACK_SENSOR) == 1)
+        runForward();
+}
 
-    Serial.print("Cam bien sau lung: ");
-    Serial.println(Backward_IR.distance());
-    Serial.print("Cam bien ben trai: ");
-    Serial.println(Left_IR.distance());
-    Serial.print("Cam bien ben phai: ");
-    Serial.println(Right_IR.distance());
-    Serial.print("Cam bien do line phia truoc: ");
-    Serial.println(digitalRead(FRONT_SENSOR));
-    Serial.print("Cam bien do line phia sau: ");
-    Serial.println(digitalRead(BACK_SENSOR));
+void runForward()
+{
+    analogWrite(EN_A, 255);
+    analogWrite(EN_B, 255);
+    digitalWrite(IN_1, 0);
+    digitalWrite(IN_2, 1);
+    digitalWrite(IN_3, 1);
+    digitalWrite(IN_4, 0);
+}
 
-    analogWrite(EN_A, 256);
-    analogWrite(EN_B, 256);
-    digitalWrite(IN_1, HIGH);
-    digitalWrite(IN_2, LOW);
-    digitalWrite(IN_3, HIGH);
-    digitalWrite(IN_4, LOW);
-    delay(2000);
+void runBackward()
+{
+    analogWrite(EN_A, 255);
+    analogWrite(EN_B, 255);
+    digitalWrite(IN_1, 1);
+    digitalWrite(IN_2, 0);
+    digitalWrite(IN_3, 0);
+    digitalWrite(IN_4, 1);
+}
 
-    analogWrite(EN_A, 100);
-    analogWrite(EN_B, 100);
-    digitalWrite(IN_1, LOW);
-    digitalWrite(IN_2, HIGH);
-    digitalWrite(IN_3, LOW);
-    digitalWrite(IN_4, HIGH);
-    delay(2000);
+void runLeft()
+{
+
+}
+
+void runRight()
+{
+
+}
+
+void runBackLeft()
+{
+  
+}
+
+void runBackRight()
+{
+
+}
+
+void stopMotor()
+{
+    analogWrite(EN_A, 0);
+    analogWrite(EN_B, 0);
+    digitalWrite(IN_1, 0);
+    digitalWrite(IN_2, 0);
+    digitalWrite(IN_3, 0);
+    digitalWrite(IN_4, 0);
+}
+
+void findEnemy()
+{
+    
 }
