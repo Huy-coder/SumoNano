@@ -1,17 +1,7 @@
-#include <SharpIR.h>
-
 //Read digital value
 #define LEFT_DETECT_LINE_SENSOR 5
 #define RIGHT_DETECT_LINE_SENSOR 4
 #define BACK_DETECT_LINE_SENSOR 3
-
-//Read analog value
-#define BACKWARD_SENSOR A3
-#define LEFT_SENSOR A1
-#define RIGHT_SENSOR A2
-
-//Model IR Sensor
-#define MODEL 1080
 
 //Motor DC
 #define EN_A 6
@@ -27,10 +17,6 @@
 #define CIRCLE 2
 #define ESCAPE 3
 
-SharpIR Backward_IR = SharpIR(BACKWARD_SENSOR, MODEL);
-SharpIR Left_IR = SharpIR(LEFT_SENSOR, MODEL);
-SharpIR Right_IR = SharpIR(RIGHT_SENSOR, MODEL);
-
 unsigned long time;
 
 void setup() {
@@ -45,28 +31,13 @@ void setup() {
   pinMode(RIGHT_DETECT_LINE_SENSOR, INPUT);
   pinMode(BACK_DETECT_LINE_SENSOR, INPUT);
   time = millis();
-
-  delay(2000);
 }
 
 void loop() {
-  // Serial.print("Cam bien sau lung: ");
-  // Serial.println(Backward_IR.distance());
-  // Serial.print("Cam bien ben trai: ");
-  // Serial.println(Left_IR.distance());
-  // Serial.print("Cam bien ben phai: ");
-  // Serial.println(Right_IR.distance());
-
-  // while(digitalRead(RIGHT_DETECT_LINE_SENSOR) == 0 && digitalRead(LEFT_DETECT_LINE_SENSOR) == 0 && digitalRead(BACK_DETECT_LINE_SENSOR) == 0)
-  // {
-  //     //findEnemy();
-  // }
-  avoidToDropOut();
-  // delay(1500);
+  checkSensor();
 }
 
 void runForward() {
-
   analogWrite(EN_A, 80);
   analogWrite(EN_B, 80);
   digitalWrite(IN_1, 1);
@@ -138,78 +109,59 @@ void stopMotor() {
   digitalWrite(IN_4, 0);
 }
 
-void attackEnemy() {
-  analogWrite(EN_A, 255);
-  analogWrite(EN_B, 255);
-  digitalWrite(IN_1, 1);
-  digitalWrite(IN_2, 0);
-  digitalWrite(IN_3, 0);
-  digitalWrite(IN_4, 1);
-}
-
-void findEnemy() {
-  if (Left_IR.distance() <= 10 || Right_IR.distance() <= 10) {
-    attackEnemy();
-    delay(500);
-    stopMotor();
-    delay(100);
-    runBackward();
-    delay(500);
-  } else if (Backward_IR.distance() <= 30) {
-    round360();
-    delay(500);
-    attackEnemy();
-    delay(500);
-    stopMotor();
-    delay(100);
-    runBackward();
-    delay(500);
+void checkSensor() {
+  boolean rightSensor = digitalRead(RIGHT_DETECT_LINE_SENSOR);
+  boolean leftSensor = digitalRead(LEFT_DETECT_LINE_SENSOR);
+  boolean backSensor = digitalRead(BACK_DETECT_LINE_SENSOR);
+  if (rightSensor == 1 || leftSensor == 1 || backSensor == 1) {
+    if (rightSensor) {
+      runBackward();
+      delay(500);
+      runLeft();
+      delay(500);
+    } else if (leftSensor) {
+      runBackward();
+      delay(500);
+      runRight();
+      delay(500);
+    } else if (rightSensor && leftSensor) {
+      runBackward();
+      delay(500);
+    } else if (backSensor) {
+      runForward();
+      delay(500);
+    }
   } else {
-    if (digitalRead(RIGHT_DETECT_LINE_SENSOR) == 1 || digitalRead(LEFT_DETECT_LINE_SENSOR) == 1) {
-      runBackward();
-      delay(500);
-    } else if (digitalRead(BACK_DETECT_LINE_SENSOR) == 1) {
-      runForward();
-      delay(500);
-    } else {
-      runForward();
-      delay(500);
-      round360();
-      delay(500);
-      runBackward();
-      delay(500);
-      round360();
-      delay(500);
-    }
+    randomMove();
   }
 }
 
-void avoidToDropOut() {
-  if (digitalRead(RIGHT_DETECT_LINE_SENSOR) == 1 || digitalRead(LEFT_DETECT_LINE_SENSOR) == 1) {
-    if (millis() - time < 500) {
-      runBackward();
-    } 
-    else
-      {
-          stopMotor();
-          time = millis(); 
-      }
-  }
-
-  else if (digitalRead(BACK_DETECT_LINE_SENSOR) == 1) 
-  {
-    if (millis() - time < 500) {
+void randomMove() {
+  int randNumber = random(1, 5);
+  switch (randNumber) {
+    case 1:
       runForward();
-    } 
-    else
-    {
-        stopMotor();
-        time = millis();
-    }
-      
+      delay(500);
+      break;
+    case 2:
+      runLeft();
+      delay(500);
+      break;
+    case 3:
+      runRight();
+      delay(500);
+      break;
+    case 4:
+      runBackward();
+      delay(500);
+      break;
+    case 5:
+      round360();
+      delay(500);
+      break;
+    default:
+      delay(500);
+      stopMotor();
+      break;
   }
-
-}
-
-void firstStart() {
 }
